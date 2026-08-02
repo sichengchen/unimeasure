@@ -148,10 +148,24 @@
   const numberPattern = `[-+]?(?:(?:\\d{1,3}(?:,\\d{3})+|\\d+)(?:\\.\\d+)?(?:[\\s-]+\\d+\\s*\/\\s*\\d+)?|\\d+\\s*\/\\s*\\d+|(?:\\d+(?:\\.\\d+)?)?[${unicodeFractionPattern}])`;
   const imperialMatchingUnits = [...imperialUnits].sort((a, b) => b.pattern.length - a.pattern.length);
   const metricMatchingUnits = [...metricUnits].sort((a, b) => b.pattern.length - a.pattern.length);
+  const imperialLengthMatchingUnits = imperialMatchingUnits.filter(({ category }) => category === "length");
+  const metricLengthMatchingUnits = metricMatchingUnits.filter(({ category }) => category === "length");
   const imperialUnitPattern = imperialMatchingUnits.map(({ pattern }) => `(?:${pattern})`).join("|");
   const metricUnitPattern = metricMatchingUnits.map(({ pattern }) => `(?:${pattern})`).join("|");
+  const imperialLengthUnitPattern = imperialLengthMatchingUnits.map(({ pattern }) => `(?:${pattern})`).join("|");
+  const metricLengthUnitPattern = metricLengthMatchingUnits.map(({ pattern }) => `(?:${pattern})`).join("|");
   const imperialMeasurementPattern = new RegExp(`(?<![\\w.])(${numberPattern})\\s*(${imperialUnitPattern})(?![A-Za-z])`, "gi");
   const metricMeasurementPattern = new RegExp(`(?<![\\w.])(${numberPattern})\\s*(${metricUnitPattern})(?![A-Za-z])`, "gi");
+  const dimensionSeparatorPattern = "(?:x|×|by)";
+  const dimensionSplitPattern = /\s*(?:x|×|by)\s*/i;
+  const imperialDimensionPattern = new RegExp(
+    `(?<![\\w.])(${numberPattern}(?:\\s*${dimensionSeparatorPattern}\\s*${numberPattern}){1,5})\\s*(${imperialLengthUnitPattern})(?![A-Za-z])`,
+    "gi"
+  );
+  const metricDimensionPattern = new RegExp(
+    `(?<![\\w.])(${numberPattern}(?:\\s*${dimensionSeparatorPattern}\\s*${numberPattern}){1,5})\\s*(${metricLengthUnitPattern})(?![A-Za-z])`,
+    "gi"
+  );
   const compoundPattern = new RegExp(
     `(?<![\\w.])(${numberPattern})\\s*(?:feet|foot|ft\\.?|[\\u0027′’])\\s*(${numberPattern})\\s*(?:inch(?:es)?|in\\.?|[\\u0022″”])(?![A-Za-z])`,
     "gi"
@@ -207,10 +221,8 @@
     return (direction === "imperial" ? imperialSuffixPattern : metricSuffixPattern).test(text.slice(end));
   }
 
-  function makeResult(text, match, value, symbol, unitId, category, settings) {
-    const formatted = formatNumber(value, settings.precision);
-    if (formatted === null || hasExistingTarget(text, match.index + match[0].length, settings.direction)) return null;
-    const converted = `${formatted} ${symbol}`;
+  function makeFormattedResult(text, match, converted, unitId, category, settings) {
+    if (hasExistingTarget(text, match.index + match[0].length, settings.direction)) return null;
     return {
       start: match.index,
       end: match.index + match[0].length,
@@ -222,6 +234,12 @@
     };
   }
 
+  function makeResult(text, match, value, symbol, unitId, category, settings) {
+    const formatted = formatNumber(value, settings.precision);
+    if (formatted === null) return null;
+    return makeFormattedResult(text, match, `${formatted} ${symbol}`, unitId, category, settings);
+  }
+
   function findConversions(text, options = {}) {
     if (!text || !/\d/.test(text)) return [];
     const settings = {
@@ -230,6 +248,27 @@
       standard: options.standard === "uk" ? "uk" : "us"
     };
     const results = [];
+
+    const dimensionDefinitions = settings.direction === "imperial" ? metricLengthMatchingUnits : imperialLengthMatchingUnits;
+    const dimensionPattern = settings.direction === "imperial" ? metricDimensionPattern : imperialDimensionPattern;
+    dimensionPattern.lastIndex = 0;
+    for (const match of text.matchAll(dimensionPattern)) {
+      const definition = findUnit(match[2], dimensionDefinitions);
+      const values = match[1].split(dimensionSplitPattern).map(parseNumber);
+      if (!definition || values.some((value) => !Number.isFinite(value))) continue;
+      const formattedValues = values.map((value) => formatNumber(definition.convert(value, settings, match[0]), settings.precision));
+      if (formattedValues.some((value) => value === null)) continue;
+      const symbol = typeof definition.symbol === "function" ? definition.symbol(settings) : definition.symbol;
+      const result = makeFormattedResult(
+        text,
+        match,
+        `${formattedValues.join(" × ")} ${symbol}`,
+        `${definition.id}-dimensions`,
+        "length",
+        settings
+      );
+      if (result) results.push(result);
+    }
 
     if (settings.direction === "metric") {
       compoundPattern.lastIndex = 0;

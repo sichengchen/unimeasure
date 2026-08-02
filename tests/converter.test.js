@@ -97,3 +97,18 @@ test("uses US or UK output units in metric-to-imperial mode", () => {
 test("does not duplicate an existing imperial equivalent", () => {
   assert.equal(annotateText("30 cm (11.81 in)", { direction: "imperial" }), "30 cm (11.81 in)");
 });
+
+test("converts dimension chains that share one trailing unit", () => {
+  assert.equal(
+    annotateText('10 1/4x18 7/8x30 3/8 "'),
+    '10 1/4x18 7/8x30 3/8 " (26.04 × 47.94 × 77.15 cm)'
+  );
+  assert.equal(
+    annotateText("10 by 20 by 30 inches"),
+    "10 by 20 by 30 inches (25.4 × 50.8 × 76.2 cm)"
+  );
+  assert.equal(
+    annotateText("120 × 60 × 30 cm", { direction: "imperial" }),
+    "120 × 60 × 30 cm (47.24 × 23.62 × 11.81 in)"
+  );
+});
