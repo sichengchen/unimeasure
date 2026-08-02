@@ -18,11 +18,7 @@ Both conversion directions support length, area, volume, mass, temperature, spee
 
 ## Install
 
-Download the latest `UniMeasure-<version>.crx` from [GitHub Releases](https://github.com/sichengchen/imperial2metric/releases/latest), then install it from your browser's extensions page. Users should use the released CRX; loading the extension unpacked is intended only for development.
-
-Chrome restricts extensions installed outside the Chrome Web Store on Windows and macOS. The released CRX can be installed directly in browsers and managed environments that permit local CRX installation.
-
-Some ambiguous shorthand—such as `in`, `oz`, `ton`, and a bare quote—uses the most common interpretation. Code blocks, form controls, editable content, SVG, and MathML are left untouched. Add `data-measuremate-ignore` to any element that should never be processed.
+Download the latest `UniMeasure-<version>.crx` from [GitHub Releases](https://github.com/sichengchen/imperial2metric/releases/latest) and install it from your browser's extensions page.
 
 ## Development
 
