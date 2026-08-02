@@ -6,6 +6,7 @@
   "description": "A Chrome extension that converts between imperial and metric measurements.",
   "scripts": {
     "build": "node scripts/build.mjs",
+    "package:crx": "pnpm build && node scripts/package-crx.mjs",
     "dev": "node scripts/serve.mjs",
     "test": "node --test tests/*.test.js",
     "check": "pnpm test && pnpm build"

@@ -1,0 +1,4 @@
+.crx/
+artifacts/*.crx
+dist.crx
+dist.pem
