@@ -20,6 +20,36 @@
     }
   };
 
+  const SI_OUTPUTS = Object.freeze({
+    "mm": { symbol: "m", convert: (v) => v / 1000 },
+    "cm": { symbol: "m", convert: (v) => v / 100 },
+    "m": { symbol: "m", convert: (v) => v },
+    "km": { symbol: "m", convert: (v) => v * 1000 },
+    "cm²": { symbol: "m²", convert: (v) => v / 10000 },
+    "m²": { symbol: "m²", convert: (v) => v },
+    "km²": { symbol: "m²", convert: (v) => v * 1000000 },
+    "ha": { symbol: "m²", convert: (v) => v * 10000 },
+    "cm³": { symbol: "m³", convert: (v) => v / 1000000 },
+    "mL": { symbol: "m³", convert: (v) => v / 1000000 },
+    "L": { symbol: "m³", convert: (v) => v / 1000 },
+    "m³": { symbol: "m³", convert: (v) => v },
+    "g": { symbol: "kg", convert: (v) => v / 1000 },
+    "kg": { symbol: "kg", convert: (v) => v },
+    "t": { symbol: "kg", convert: (v) => v * 1000 },
+    "°C": { symbol: "K", convert: (v) => v + 273.15 },
+    "km/h": { symbol: "m/s", convert: (v) => v / 3.6 },
+    "m/s": { symbol: "m/s", convert: (v) => v },
+    "m/s²": { symbol: "m/s²", convert: (v) => v },
+    "kPa": { symbol: "Pa", convert: (v) => v * 1000 },
+    "kJ": { symbol: "J", convert: (v) => v * 1000 },
+    "J": { symbol: "J", convert: (v) => v },
+    "kW": { symbol: "W", convert: (v) => v * 1000 },
+    "N": { symbol: "N", convert: (v) => v },
+    "N·m": { symbol: "N·m", convert: (v) => v },
+    "L/100 km": { symbol: "m²", convert: (v) => v * 0.00000001 },
+    "L/min": { symbol: "m³/s", convert: (v) => v / 60000 }
+  });
+
   const unit = (id, pattern, symbol, convert, category) => ({ id, pattern, symbol, convert, category });
   const imperialUnits = [
     unit("square-mile", "(?:square\\s+miles?|sq\\.?\\s*mi\\.?|mi(?:les?)?\\s*[²2])", "km²", (v) => v * 2.589988110336, "area"),
@@ -94,6 +124,7 @@
     unit("metric-milligram", "(?:milligrams?|mg)", "oz", (v) => v / 28349.523125, "mass"),
     unit("metric-gram", "(?:grams?|g)", "oz", (v) => v / 28.349523125, "mass"),
 
+    unit("kelvin", "(?:kelvins?|K)", "°F", (v) => (v - 273.15) * (9 / 5) + 32, "temperature"),
     unit("celsius", "(?:degrees?\\s+celsius|celsius|°\\s*C)", "°F", (v) => v * (9 / 5) + 32, "temperature"),
     unit("kilometres-per-hour", "(?:kilomet(?:er|re)s?\\s+per\\s+hour|km\\.?\\s*\/\\s*h|kph)", "mph", (v) => v / 1.609344, "speed"),
     unit("metres-per-second-squared", "(?:m\\.?\\s*\/\\s*s(?:²|2)|met(?:er|re)s?\\s+per\\s+second\\s+squared)", "ft/s²", (v) => v / 0.3048, "acceleration"),
@@ -116,6 +147,7 @@
     }, "fuel-economy"),
     unit("kilometres-per-litre", "(?:kilomet(?:er|re)s?\\s+per\\s+lit(?:er|re)|km\\s*\/\\s*L)", "mpg", (v, o) => v * (o.standard === "uk" ? 2.824809363 : 2.352145833), "fuel-economy"),
     unit("litres-per-minute", "(?:lit(?:er|re)s?\\s+per\\s+minute|L\\s*\/\\s*min)", "gpm", (v, o) => v / VOLUME[o.standard].gallonL, "flow"),
+    unit("cubic-metres-per-second", "(?:cubic\\s+met(?:er|re)s?\\s+per\\s+second|m(?:³|3)\\s*\/\\s*s)", "gpm", (v, o) => v * 60000 / VOLUME[o.standard].gallonL, "flow"),
 
     unit("metric-kilometre", "(?:kilomet(?:er|re)s?|km\\.?)", "mi", (v) => v / 1.609344, "length"),
     unit("metric-centimetre", "(?:centimet(?:er|re)s?|cm\\.?)", "in", (v) => v / 2.54, "length"),
@@ -202,6 +234,19 @@
     return definitions.find(({ pattern }) => new RegExp(`^(?:${pattern})$`, "i").test(rawUnit));
   }
 
+  function convertDefinition(definition, value, settings, raw) {
+    let convertedValue = definition.convert(value, settings, raw);
+    let symbol = typeof definition.symbol === "function" ? definition.symbol(settings) : definition.symbol;
+    if (settings.direction === "metric" && settings.physicsMode) {
+      const siOutput = SI_OUTPUTS[symbol];
+      if (siOutput) {
+        convertedValue = siOutput.convert(convertedValue);
+        symbol = siOutput.symbol;
+      }
+    }
+    return { value: convertedValue, symbol };
+  }
+
   function formatNumber(value, precision = "smart") {
     if (!Number.isFinite(value)) return null;
     const requested = precision === "smart" ? null : Number(precision);
@@ -211,6 +256,23 @@
       maximumFractionDigits,
       minimumFractionDigits: 0
     }).format(value);
+  }
+
+  function formatConvertedNumber(value, settings) {
+    if (!settings.physicsMode) return formatNumber(value, settings.precision);
+    if (!Number.isFinite(value)) return null;
+    const absolute = Math.abs(value);
+    if (absolute !== 0 && absolute < 0.001) {
+      const significantDigits = settings.precision === "smart" ? 6 : Math.max(1, Number(settings.precision) + 1);
+      return new Intl.NumberFormat("en-US", {
+        notation: "scientific",
+        maximumSignificantDigits: significantDigits
+      }).format(value);
+    }
+    if (settings.precision === "smart") {
+      return new Intl.NumberFormat("en-US", { maximumSignificantDigits: 6 }).format(value);
+    }
+    return formatNumber(value, settings.precision);
   }
 
   function overlaps(candidate, accepted) {
@@ -235,7 +297,7 @@
   }
 
   function makeResult(text, match, value, symbol, unitId, category, settings) {
-    const formatted = formatNumber(value, settings.precision);
+    const formatted = formatConvertedNumber(value, settings);
     if (formatted === null) return null;
     return makeFormattedResult(text, match, `${formatted} ${symbol}`, unitId, category, settings);
   }
@@ -244,6 +306,7 @@
     if (!text || !/\d/.test(text)) return [];
     const settings = {
       direction: options.direction === "imperial" ? "imperial" : "metric",
+      physicsMode: options.direction !== "imperial" && options.physicsMode === true,
       precision: options.precision || "smart",
       standard: options.standard === "uk" ? "uk" : "us"
     };
@@ -256,9 +319,10 @@
       const definition = findUnit(match[2], dimensionDefinitions);
       const values = match[1].split(dimensionSplitPattern).map(parseNumber);
       if (!definition || values.some((value) => !Number.isFinite(value))) continue;
-      const formattedValues = values.map((value) => formatNumber(definition.convert(value, settings, match[0]), settings.precision));
+      const convertedValues = values.map((value) => convertDefinition(definition, value, settings, match[0]));
+      const formattedValues = convertedValues.map(({ value }) => formatConvertedNumber(value, settings));
       if (formattedValues.some((value) => value === null)) continue;
-      const symbol = typeof definition.symbol === "function" ? definition.symbol(settings) : definition.symbol;
+      const symbol = convertedValues[0].symbol;
       const result = makeFormattedResult(
         text,
         match,
@@ -275,7 +339,9 @@
       for (const match of text.matchAll(compoundPattern)) {
         const feet = parseNumber(match[1]);
         const inches = parseNumber(match[2]);
-        const result = makeResult(text, match, (feet * 12 + inches) * 2.54, "cm", "foot-inch", "length", settings);
+        const value = (feet * 12 + inches) * (settings.physicsMode ? 0.0254 : 2.54);
+        const symbol = settings.physicsMode ? "m" : "cm";
+        const result = makeResult(text, match, value, symbol, "foot-inch", "length", settings);
         if (result) results.push(result);
       }
     }
@@ -287,12 +353,12 @@
       const definition = findUnit(match[2], definitions);
       const numericValue = parseNumber(match[1]);
       if (!definition || !Number.isFinite(numericValue)) continue;
-      const symbol = typeof definition.symbol === "function" ? definition.symbol(settings) : definition.symbol;
+      const converted = convertDefinition(definition, numericValue, settings, match[0]);
       const candidate = makeResult(
         text,
         match,
-        definition.convert(numericValue, settings, match[0]),
-        symbol,
+        converted.value,
+        converted.symbol,
         definition.id,
         definition.category,
         settings

@@ -39,6 +39,7 @@ h1 {
 }
 
 .row--primary { border-top-color: #080808; }
+.row[hidden] { display: none; }
 
 .count {
   min-height: 52px;

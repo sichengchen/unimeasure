@@ -2,6 +2,7 @@
   const DEFAULT_SETTINGS = Object.freeze({
     enabledByDefault: true,
     direction: "metric",
+    physicsMode: false,
     precision: "smart",
     standard: "us",
     highlight: true,
@@ -32,6 +33,7 @@
     return {
       enabledByDefault: value.enabledByDefault !== false,
       direction,
+      physicsMode: value.physicsMode === true,
       precision,
       standard,
       highlight: value.highlight !== false,

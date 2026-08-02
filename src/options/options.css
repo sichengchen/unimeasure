@@ -45,6 +45,7 @@ h1 {
 }
 
 .setting-row:last-of-type { border-bottom: 1px solid var(--rule); }
+.setting-row[hidden] { display: none; }
 
 input[type="checkbox"] {
   appearance: none;

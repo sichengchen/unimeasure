@@ -9,6 +9,7 @@ test("accepts empty first-run storage", () => {
   assert.deepEqual(sanitizeSettings(null), {
     enabledByDefault: true,
     direction: "metric",
+    physicsMode: false,
     precision: "smart",
     standard: "us",
     highlight: true,

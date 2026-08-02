@@ -4,6 +4,8 @@
   const siteToggle = document.querySelector("#site-enabled");
   const count = document.querySelector("#site-note");
   const direction = document.querySelector("#direction");
+  const physicsRow = document.querySelector("#physics-row");
+  const physicsMode = document.querySelector("#physics-mode");
   const precision = document.querySelector("#precision");
   const standard = document.querySelector("#standard");
   const highlight = document.querySelector("#highlight");
@@ -50,7 +52,11 @@
   });
 
   precision.addEventListener("change", () => saveSettings({ precision: precision.value }));
-  direction.addEventListener("change", () => saveSettings({ direction: direction.value }));
+  direction.addEventListener("change", () => {
+    physicsRow.hidden = direction.value !== "metric";
+    saveSettings({ direction: direction.value });
+  });
+  physicsMode.addEventListener("change", () => saveSettings({ physicsMode: physicsMode.checked }));
   standard.addEventListener("change", () => saveSettings({ standard: standard.value }));
   highlight.addEventListener("change", () => saveSettings({ highlight: highlight.checked }));
   settingsButton.addEventListener("click", () => platform.openOptionsPage());
@@ -62,6 +68,8 @@
     try { hostname = normalizeHostname(new URL(tab.url).hostname); } catch { hostname = ""; }
     precision.value = settings.precision;
     direction.value = settings.direction;
+    physicsMode.checked = settings.physicsMode;
+    physicsRow.hidden = settings.direction !== "metric";
     standard.value = settings.standard;
     highlight.checked = settings.highlight;
     siteToggle.checked = settings.enabledByDefault && !isSiteExcluded(hostname, settings.excludedSites);

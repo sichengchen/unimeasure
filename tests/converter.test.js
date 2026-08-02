@@ -112,3 +112,30 @@ test("converts dimension chains that share one trailing unit", () => {
     "120 × 60 × 30 cm (47.24 × 23.62 × 11.81 in)"
   );
 });
+
+test("uses convenience metric lengths unless Physics mode is enabled", () => {
+  assert.equal(annotateText("1 mi, 1 ft, 1 in"), "1 mi (1.61 km), 1 ft (0.305 m), 1 in (2.54 cm)");
+  assert.equal(
+    annotateText("1 mi, 1 ft, 1 in", { physicsMode: true }),
+    "1 mi (1,609.34 m), 1 ft (0.3048 m), 1 in (0.0254 m)"
+  );
+});
+
+test("Physics mode uses coherent SI outputs", () => {
+  const output = annotateText("1 gal, 12 lb, 68°F, 55 mph, 30 psi, 2 BTU, 1 hp, 3 gpm", { physicsMode: true });
+  assert.match(output, /1 gal \(0\.00378541 m³\)/);
+  assert.match(output, /12 lb \(5\.44311 kg\)/);
+  assert.match(output, /68°F \(293\.15 K\)/);
+  assert.match(output, /55 mph \(24\.5872 m\/s\)/);
+  assert.match(output, /30 psi \(206,843 Pa\)/);
+  assert.match(output, /2 BTU \(2,110\.11 J\)/);
+  assert.match(output, /1 hp \(745\.7 W\)/);
+  assert.match(output, /3 gpm \(1\.89271E-4 m³\/s\)/);
+});
+
+test("Physics mode normalizes shared-unit dimension chains to metres", () => {
+  assert.equal(
+    annotateText('10 1/4x18 7/8x30 3/8 "', { physicsMode: true }),
+    '10 1/4x18 7/8x30 3/8 " (0.26035 × 0.479425 × 0.771525 m)'
+  );
+});

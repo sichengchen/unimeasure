@@ -4,6 +4,8 @@
   const form = document.querySelector("#settings-form");
   const enabled = document.querySelector("#enabled");
   const direction = document.querySelector("#direction");
+  const physicsRow = document.querySelector("#physics-row");
+  const physicsMode = document.querySelector("#physics-mode");
   const precision = document.querySelector("#precision");
   const standard = document.querySelector("#standard");
   const highlight = document.querySelector("#highlight");
@@ -54,11 +56,17 @@
     const settings = sanitizeSettings(stored);
     enabled.checked = settings.enabledByDefault;
     direction.value = settings.direction;
+    physicsMode.checked = settings.physicsMode;
+    physicsRow.hidden = settings.direction !== "metric";
     precision.value = settings.precision;
     standard.value = settings.standard;
     highlight.checked = settings.highlight;
     excludedSites = new Set(settings.excludedSites);
     renderExceptions();
+  });
+
+  direction.addEventListener("change", () => {
+    physicsRow.hidden = direction.value !== "metric";
   });
 
   addException.addEventListener("click", addHostname);
@@ -79,6 +87,7 @@
     const settings = sanitizeSettings({
       enabledByDefault: enabled.checked,
       direction: direction.value,
+      physicsMode: physicsMode.checked,
       precision: precision.value,
       standard: standard.value,
       highlight: highlight.checked,
