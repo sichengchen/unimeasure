@@ -5,7 +5,7 @@
 }
 
 .measuremate-annotation--highlighted {
-  background: #dfe7ff;
+  background: rgb(0 71 255 / 14%);
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
   border-radius: 2px;

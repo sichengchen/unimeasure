@@ -14,7 +14,13 @@
       p { max-width: 720px; margin: 0; padding: 22px 0; border-top: 1px solid #c9c9c9; font-size: clamp(18px, 2.5vw, 26px); line-height: 1.45; }
       p:last-of-type { border-bottom: 1px solid #c9c9c9; }
       code { font: inherit; }
+      html[data-theme="dark"] body { color: #d9dce3; background: #22252b; }
+      html[data-theme="dark"] header,
+      html[data-theme="dark"] p { border-color: #515660; }
     </style>
+    <script>
+      if (new URLSearchParams(location.search).get("theme") === "dark") document.documentElement.dataset.theme = "dark";
+    </script>
   </head>
   <body>
     <header>Product specifications</header>
