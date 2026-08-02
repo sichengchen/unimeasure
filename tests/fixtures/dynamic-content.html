@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Dynamic content fixture</title>
+    <link rel="stylesheet" href="/src/content/content.css">
+  </head>
+  <body>
+    <p id="listing">Testing a Zinus 8inch mattress.</p>
+    <button id="rerender" type="button">Rerender listing</button>
+    <output id="status" aria-live="polite"></output>
+
+    <script src="/src/shared/platform.js"></script>
+    <script src="/src/shared/settings.js"></script>
+    <script src="/src/shared/converter.js"></script>
+    <script src="/src/content/content.js"></script>
+    <script>
+      document.querySelector("#rerender").addEventListener("click", () => {
+        let updates = 0;
+        const timer = setInterval(() => {
+          const source = [...document.querySelector("#listing").childNodes]
+            .find((node) => node.nodeType === Node.TEXT_NODE && /8inch/.test(node.nodeValue));
+          source.nodeValue = source.nodeValue.replace(/zinus/i, updates % 2 ? "Zinus" : "zinus");
+          updates += 1;
+
+          if (updates === 7) {
+            clearInterval(timer);
+            setTimeout(() => {
+              const count = document.querySelectorAll("#listing .measuremate-annotation").length;
+              document.querySelector("#status").textContent = `${count} annotation after ${updates} updates`;
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

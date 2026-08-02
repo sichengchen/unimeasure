@@ -1,3 +1,10 @@
+.measuremate-annotation-separator {
+  display: inline;
+  color: inherit;
+  font: inherit;
+  white-space: inherit;
+}
+
 .measuremate-annotation {
   color: inherit;
   font: inherit;
