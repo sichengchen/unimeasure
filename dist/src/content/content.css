@@ -1,0 +1,13 @@
+.measuremate-annotation {
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+}
+
+.measuremate-annotation--highlighted {
+  background: #dfe7ff;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  border-radius: 2px;
+  padding: 0 0.08em;
+}

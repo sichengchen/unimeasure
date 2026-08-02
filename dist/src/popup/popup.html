@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniMeasure</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="popup">
+      <h1>UniMeasure</h1>
+
+      <div class="site-row row row--primary">
+        <label for="site-enabled">On for this site</label>
+        <input id="site-enabled" class="switch" type="checkbox" aria-describedby="site-note">
+      </div>
+      <p id="site-note" class="count" aria-live="polite">— conversions</p>
+
+      <label class="row" for="direction">
+        <span>Convert to</span>
+        <select id="direction">
+          <option value="metric">Metric</option>
+          <option value="imperial">Imperial</option>
+        </select>
+      </label>
+
+      <label class="row" for="precision">
+        <span>Precision</span>
+        <select id="precision">
+          <option value="smart">Smart</option>
+          <option value="0">0 decimals</option>
+          <option value="1">1 decimal</option>
+          <option value="2">2 decimals</option>
+          <option value="3">3 decimals</option>
+          <option value="4">4 decimals</option>
+        </select>
+      </label>
+
+      <label class="row" for="standard">
+        <span>Standard</span>
+        <select id="standard">
+          <option value="us">US</option>
+          <option value="uk">UK</option>
+        </select>
+      </label>
+
+      <div class="row">
+        <label for="highlight">Highlight</label>
+        <input id="highlight" class="switch" type="checkbox">
+      </div>
+
+      <button id="settings" class="settings-link" type="button">Settings</button>
+    </main>
+    <script src="../shared/platform.js"></script>
+    <script src="../shared/settings.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

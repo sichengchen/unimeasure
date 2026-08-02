@@ -1,0 +1,16 @@
+{
+  "name": "measuremate",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A Chrome extension that converts between imperial and metric measurements.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.js",
+    "check": "pnpm test && pnpm build"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

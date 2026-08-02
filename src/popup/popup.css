@@ -1,0 +1,117 @@
+:root {
+  color-scheme: light;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #080808;
+  background: #fff;
+  --blue: #0047ff;
+  --rule: #c9c9c9;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  width: 360px;
+  margin: 0;
+  background: #fff;
+}
+
+button, select, input { font: inherit; }
+
+.popup { padding: 28px 28px 24px; }
+
+h1 {
+  margin: 0 0 28px;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-weight: 700;
+}
+
+.row {
+  min-height: 56px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.row--primary { border-top-color: #080808; }
+
+.count {
+  min-height: 52px;
+  margin: 0;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  color: #505050;
+  font-size: 14px;
+}
+
+select {
+  appearance: none;
+  width: 124px;
+  border: 0;
+  padding: 10px 34px 10px 10px;
+  color: #080808;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 6 5 5 5-5' fill='none' stroke='%23080808' stroke-width='1.4'/%3E%3C/svg%3E") right 10px center/16px no-repeat;
+  text-align: left;
+  cursor: pointer;
+}
+
+.switch {
+  appearance: none;
+  width: 42px;
+  height: 24px;
+  margin: 0;
+  border: 1px solid #080808;
+  border-radius: 12px;
+  background: #fff;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #080808;
+  transition: transform 120ms ease, background-color 120ms ease;
+}
+
+.switch:checked { background: var(--blue); border-color: var(--blue); }
+.switch:checked::after { transform: translateX(18px); background: #fff; }
+
+:where(button, select, input):focus,
+:where(button, select, input):focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.settings-link {
+  display: block;
+  margin: 0;
+  width: 100%;
+  border: 0;
+  border-top: 1px solid #080808;
+  padding: 18px 0 0;
+  color: var(--blue);
+  background: transparent;
+  text-align: left;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.is-unavailable .site-row { color: #777; }
+.is-unavailable .switch { opacity: 0.45; cursor: not-allowed; }
+
+@media (prefers-reduced-motion: reduce) {
+  .switch, .switch::after { transition: none; }
+}

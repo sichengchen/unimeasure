@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniMeasure Conversion Demo</title>
+    <link rel="stylesheet" href="../src/content/content.css">
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; color: #080808; background: #fff; font-family: Arial, Helvetica, sans-serif; }
+      header { height: 72px; border-bottom: 1px solid #c9c9c9; padding: 0 5vw; display: flex; align-items: center; font-size: 18px; font-weight: 700; }
+      main { width: min(860px, 90vw); margin: 9vh auto; }
+      h1 { max-width: 760px; margin: 0 0 32px; font-size: clamp(42px, 7vw, 78px); line-height: .95; letter-spacing: -.06em; }
+      p { max-width: 720px; margin: 0; padding: 22px 0; border-top: 1px solid #c9c9c9; font-size: clamp(18px, 2.5vw, 26px); line-height: 1.45; }
+      p:last-of-type { border-bottom: 1px solid #c9c9c9; }
+      code { font: inherit; }
+    </style>
+  </head>
+  <body>
+    <header>Product specifications</header>
+    <main>
+      <h1>Measurements,<br>made legible.</h1>
+      <p>The shelf is 48" wide and 10 1/4 " deep.</p>
+      <p>The package weighs 12 lb and holds 2.5 gal.</p>
+      <p>Rated for 55 mph at 68°F and 30 psi.</p>
+      <p>The metric shelf is 120 cm wide and carries 20 kg.</p>
+      <p>Rated for 100 km/h at 20°C and 200 kPa.</p>
+    </main>
+    <script src="../src/shared/platform.js"></script>
+    <script src="../src/shared/settings.js"></script>
+    <script src="../src/shared/converter.js"></script>
+    <script src="../src/content/content.js"></script>
+  </body>
+</html>
