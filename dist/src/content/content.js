@@ -36,11 +36,13 @@
     let cursor = 0;
     for (const conversion of conversions) {
       fragment.append(document.createTextNode(text.slice(cursor, conversion.end)));
+      const separator = conversion.annotation.match(/^\s*/)?.[0] || "";
+      if (separator) fragment.append(document.createTextNode(separator));
       const annotation = document.createElement("span");
       annotation.className = settings.highlight ? `${ANNOTATION_CLASS} ${HIGHLIGHT_CLASS}` : ANNOTATION_CLASS;
       annotation.dataset.measuremateUnit = conversion.unitId;
       annotation.setAttribute("aria-label", `converted equivalent: ${conversion.converted}`);
-      annotation.textContent = conversion.annotation;
+      annotation.textContent = conversion.annotation.slice(separator.length);
       fragment.append(annotation);
       cursor = conversion.end;
     }
