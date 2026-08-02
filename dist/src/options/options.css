@@ -22,6 +22,8 @@ button, select, textarea, input { font: inherit; }
   letter-spacing: -0.03em;
 }
 
+.brand-rail { display: none; }
+
 main {
   width: min(680px, calc(100% - 64px));
   margin: 56px max(32px, calc((100vw - 1040px) / 2)) 80px;
@@ -210,6 +212,45 @@ button[type="submit"]:hover { background: #003bd4; }
 :where(button, select, input):focus-visible {
   outline: none;
   box-shadow: none;
+}
+
+@media (min-width: 1180px) {
+  .masthead { display: none; }
+
+  .page-shell {
+    width: min(1040px, calc(100% - 96px));
+    margin: 64px auto 80px;
+    display: grid;
+    grid-template-columns: minmax(0, 680px) minmax(0, 1fr);
+    align-items: start;
+    gap: 64px;
+  }
+
+  main {
+    width: auto;
+    margin: 0;
+  }
+
+  .brand-rail {
+    position: sticky;
+    top: 48px;
+    height: calc(100vh - 96px);
+    min-height: 360px;
+    border-left: 2px solid #080808;
+    padding: 0 0 4px 20px;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .brand-rail span {
+    color: var(--blue);
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.045em;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
 }
 
 @media (max-width: 600px) {

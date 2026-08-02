@@ -8,63 +8,68 @@
   </head>
   <body>
     <header class="masthead"><span>UniMeasure</span></header>
-    <main>
-      <h1>Settings</h1>
-      <form id="settings-form">
-        <div class="setting-row">
-          <label for="enabled">Enable by default</label>
-          <input id="enabled" type="checkbox">
-        </div>
-        <div class="setting-row">
-          <label for="direction">Convert to</label>
-          <select id="direction">
-            <option value="metric">Metric</option>
-            <option value="imperial">Imperial</option>
-          </select>
-        </div>
-        <div id="physics-row" class="setting-row">
-          <label for="physics-mode">Physics mode</label>
-          <input id="physics-mode" type="checkbox">
-        </div>
-        <div class="setting-row">
-          <label for="precision">Precision</label>
-          <select id="precision">
-            <option value="smart">Smart</option>
-            <option value="0">0 decimals</option>
-            <option value="1">1 decimal</option>
-            <option value="2">2 decimals</option>
-            <option value="3">3 decimals</option>
-            <option value="4">4 decimals</option>
-          </select>
-        </div>
-        <div class="setting-row">
-          <label for="standard">Standard</label>
-          <select id="standard">
-            <option value="us">US customary</option>
-            <option value="uk">UK imperial</option>
-          </select>
-        </div>
-        <div class="setting-row">
-          <label for="highlight">Highlight additions</label>
-          <input id="highlight" type="checkbox">
-        </div>
-
-        <section>
-          <h2>Site exceptions</h2>
-          <div class="exception-add">
-            <label class="visually-hidden" for="exception-input">Hostname</label>
-            <input id="exception-input" type="text" placeholder="example.com" spellcheck="false" autocomplete="off" autocapitalize="none">
-            <button id="add-exception" class="add-button" type="button">Add</button>
+    <div class="page-shell">
+      <main>
+        <h1>Settings</h1>
+        <form id="settings-form">
+          <div class="setting-row">
+            <label for="enabled">Enable by default</label>
+            <input id="enabled" type="checkbox">
           </div>
-          <ul id="exception-list" class="exception-list" aria-label="Excluded sites"></ul>
-        </section>
+          <div class="setting-row">
+            <label for="direction">Convert to</label>
+            <select id="direction">
+              <option value="metric">Metric</option>
+              <option value="imperial">Imperial</option>
+            </select>
+          </div>
+          <div id="physics-row" class="setting-row">
+            <label for="physics-mode">Physics mode</label>
+            <input id="physics-mode" type="checkbox">
+          </div>
+          <div class="setting-row">
+            <label for="precision">Precision</label>
+            <select id="precision">
+              <option value="smart">Smart</option>
+              <option value="0">0 decimals</option>
+              <option value="1">1 decimal</option>
+              <option value="2">2 decimals</option>
+              <option value="3">3 decimals</option>
+              <option value="4">4 decimals</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <label for="standard">Standard</label>
+            <select id="standard">
+              <option value="us">US customary</option>
+              <option value="uk">UK imperial</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <label for="highlight">Highlight additions</label>
+            <input id="highlight" type="checkbox">
+          </div>
 
-        <div class="actions">
-          <button type="submit">Save</button>
-          <output id="save-status" aria-live="polite"></output>
-        </div>
-      </form>
-    </main>
+          <section>
+            <h2>Site exceptions</h2>
+            <div class="exception-add">
+              <label class="visually-hidden" for="exception-input">Hostname</label>
+              <input id="exception-input" type="text" placeholder="example.com" spellcheck="false" autocomplete="off" autocapitalize="none">
+              <button id="add-exception" class="add-button" type="button">Add</button>
+            </div>
+            <ul id="exception-list" class="exception-list" aria-label="Excluded sites"></ul>
+          </section>
+
+          <div class="actions">
+            <button type="submit">Save</button>
+            <output id="save-status" aria-live="polite"></output>
+          </div>
+        </form>
+      </main>
+      <aside class="brand-rail" aria-label="UniMeasure">
+        <span>UniMeasure</span>
+      </aside>
+    </div>
     <script src="../shared/platform.js"></script>
     <script src="../shared/settings.js"></script>
     <script src="options.js"></script>
