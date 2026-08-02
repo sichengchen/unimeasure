@@ -1,7 +1,6 @@
 (function initializeOptions() {
   const { sanitizeSettings, normalizeHostname } = globalThis.MeasuremateSettings;
   const platform = globalThis.MeasurematePlatform;
-  const form = document.querySelector("#settings-form");
   const enabled = document.querySelector("#enabled");
   const direction = document.querySelector("#direction");
   const physicsRow = document.querySelector("#physics-row");
@@ -12,9 +11,22 @@
   const exceptionInput = document.querySelector("#exception-input");
   const addException = document.querySelector("#add-exception");
   const exceptionList = document.querySelector("#exception-list");
-  const status = document.querySelector("#save-status");
-  let statusTimer;
   let excludedSites = new Set();
+  let saveQueue = Promise.resolve();
+
+  function persistSettings() {
+    const settings = sanitizeSettings({
+      enabledByDefault: enabled.checked,
+      direction: direction.value,
+      physicsMode: physicsMode.checked,
+      precision: precision.value,
+      standard: standard.value,
+      highlight: highlight.checked,
+      excludedSites: [...excludedSites]
+    });
+    saveQueue = saveQueue.catch(() => {}).then(() => platform.setSettings(settings));
+    return saveQueue;
+  }
 
   function renderExceptions() {
     exceptionList.replaceChildren();
@@ -49,6 +61,7 @@
     excludedSites.add(hostname);
     exceptionInput.value = "";
     renderExceptions();
+    persistSettings();
     exceptionInput.focus();
   }
 
@@ -67,7 +80,12 @@
 
   direction.addEventListener("change", () => {
     physicsRow.hidden = direction.value !== "metric";
+    persistSettings();
   });
+
+  for (const control of [enabled, physicsMode, precision, standard, highlight]) {
+    control.addEventListener("change", persistSettings);
+  }
 
   addException.addEventListener("click", addHostname);
   exceptionInput.addEventListener("keydown", (event) => {
@@ -80,24 +98,6 @@
     if (!button) return;
     excludedSites.delete(button.dataset.hostname);
     renderExceptions();
-  });
-
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const settings = sanitizeSettings({
-      enabledByDefault: enabled.checked,
-      direction: direction.value,
-      physicsMode: physicsMode.checked,
-      precision: precision.value,
-      standard: standard.value,
-      highlight: highlight.checked,
-      excludedSites: [...excludedSites]
-    });
-    await platform.setSettings(settings);
-    excludedSites = new Set(settings.excludedSites);
-    renderExceptions();
-    status.textContent = "Saved";
-    clearTimeout(statusTimer);
-    statusTimer = setTimeout(() => { status.textContent = ""; }, 1800);
+    persistSettings();
   });
 })();

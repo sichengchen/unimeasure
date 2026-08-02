@@ -182,32 +182,6 @@ h2 {
   border: 0;
 }
 
-.actions {
-  min-height: 76px;
-  border-top: 1px solid var(--rule);
-  margin-top: 24px;
-  padding-top: 20px;
-  display: flex;
-  align-items: flex-start;
-  gap: 18px;
-}
-
-button[type="submit"] {
-  min-width: 112px;
-  height: 44px;
-  border: 1px solid var(--blue);
-  border-radius: 2px;
-  padding: 0 22px;
-  color: #fff;
-  background: var(--blue);
-  font-weight: 700;
-  cursor: pointer;
-}
-
-button[type="submit"]:hover { background: #003bd4; }
-
-#save-status { padding-top: 12px; color: #404040; font-size: 14px; }
-
 :where(button, select, input):focus,
 :where(button, select, input):focus-visible {
   outline: none;
@@ -232,10 +206,12 @@ button[type="submit"]:hover { background: #003bd4; }
   }
 
   .brand-rail {
-    position: sticky;
+    position: fixed;
     top: 48px;
-    height: calc(100vh - 96px);
-    min-height: 360px;
+    bottom: 48px;
+    left: calc(50% + 224px);
+    width: 296px;
+    min-height: 0;
     border-left: 2px solid #080808;
     padding: 0 0 4px 20px;
     display: flex;
