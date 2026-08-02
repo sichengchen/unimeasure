@@ -133,7 +133,6 @@ h2 {
   list-style: none;
   margin: 16px 0 0;
   padding: 0;
-  border-top: 1px solid var(--rule);
 }
 
 .exception-item {
@@ -144,6 +143,8 @@ h2 {
   justify-content: space-between;
   gap: 20px;
 }
+
+.exception-item:first-child { border-top: 1px solid var(--rule); }
 
 .exception-hostname {
   min-width: 0;
@@ -161,7 +162,6 @@ h2 {
 
 .exception-empty {
   min-height: 52px;
-  border-bottom: 1px solid var(--rule);
   display: flex;
   align-items: center;
   color: #5a5a5a;

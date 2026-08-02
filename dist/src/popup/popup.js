@@ -2,7 +2,6 @@
   const { sanitizeSettings, normalizeHostname, isSiteExcluded } = globalThis.MeasuremateSettings;
   const platform = globalThis.MeasurematePlatform;
   const siteToggle = document.querySelector("#site-enabled");
-  const count = document.querySelector("#site-note");
   const direction = document.querySelector("#direction");
   const physicsRow = document.querySelector("#physics-row");
   const physicsMode = document.querySelector("#physics-mode");
@@ -31,16 +30,12 @@
     if (!activeTab?.id || !/^https?:/.test(activeTab.url || "")) {
       document.body.classList.add("is-unavailable");
       siteToggle.disabled = true;
-      count.textContent = "Unavailable on this page";
       return;
     }
     try {
       const status = await platform.sendTabMessage(activeTab.id, { type: "measuremate:get-status" });
       siteToggle.checked = status.enabled;
-      count.textContent = `${status.count} ${status.count === 1 ? "conversion" : "conversions"}`;
-    } catch {
-      count.textContent = "Reload page to start";
-    }
+    } catch { /* The page may need to be reloaded before its status is available. */ }
   }
 
   siteToggle.addEventListener("change", async () => {

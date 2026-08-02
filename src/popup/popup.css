@@ -41,16 +41,6 @@ h1 {
 .row--primary { border-top-color: #080808; }
 .row[hidden] { display: none; }
 
-.count {
-  min-height: 52px;
-  margin: 0;
-  border-top: 1px solid var(--rule);
-  display: flex;
-  align-items: center;
-  color: #505050;
-  font-size: 14px;
-}
-
 select {
   appearance: none;
   width: 124px;
