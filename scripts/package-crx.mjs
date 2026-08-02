@@ -121,6 +121,7 @@ if (!hasConfiguredKey) {
 
 await verifyCrx3(generatedCrx);
 await copyFile(generatedCrx, artifact);
+await chmod(artifact, 0o644);
 await rm(generatedCrx, { force: true });
 
 console.log(`Packed CRX3: ${artifact}`);
