@@ -1,6 +1,6 @@
 {
   "name": "measuremate",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "private": true,
   "type": "module",
   "description": "A Chrome extension that converts between imperial and metric measurements.",
