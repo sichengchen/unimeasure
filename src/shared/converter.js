@@ -279,6 +279,18 @@
     return accepted.some((item) => candidate.start < item.end && candidate.end > item.start);
   }
 
+  function isOrdinalStoneMatch(match) {
+    const rawUnit = match[2];
+    if (!/^st\.?$/i.test(rawUnit)) return false;
+
+    const separator = match[0].slice(match[1].length, -rawUnit.length);
+    const integer = match[1].replace(/,/g, "");
+    if (separator || !/^\+?\d+$/.test(integer)) return false;
+
+    const value = Number(integer);
+    return value % 10 === 1 && value % 100 !== 11;
+  }
+
   function hasExistingTarget(text, end, direction) {
     return (direction === "imperial" ? imperialSuffixPattern : metricSuffixPattern).test(text.slice(end));
   }
@@ -350,6 +362,7 @@
     const measurementPattern = settings.direction === "imperial" ? metricMeasurementPattern : imperialMeasurementPattern;
     measurementPattern.lastIndex = 0;
     for (const match of text.matchAll(measurementPattern)) {
+      if (settings.direction === "metric" && isOrdinalStoneMatch(match)) continue;
       const definition = findUnit(match[2], definitions);
       const numericValue = parseNumber(match[1]);
       if (!definition || !Number.isFinite(numericValue)) continue;

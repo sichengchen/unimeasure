@@ -67,6 +67,12 @@ test("does not duplicate an existing metric equivalent", () => {
   assert.equal(annotateText("48 in (121.92 cm)"), "48 in (121.92 cm)");
 });
 
+test("does not interpret ordinal st suffixes as stone", () => {
+  assert.equal(annotateText("【1st シングル(1987/5/1)】"), "【1st シングル(1987/5/1)】");
+  assert.equal(annotateText("The 21st edition"), "The 21st edition");
+  assert.equal(annotateText("1 st, 12st, 1 stone"), "1 st (6.35 kg), 12st (76.2 kg), 1 stone (6.35 kg)");
+});
+
 test("returns stable ordered ranges for multiple measurements", () => {
   const results = findConversions("A 12 lb box is 2 ft wide.");
   assert.deepEqual(results.map((result) => result.unitId), ["pound", "foot"]);
