@@ -1,35 +1,38 @@
-name: Release CRX
+name: Cut CRX Release
 
 on:
-  push:
-    tags:
-      - "v*"
   workflow_dispatch:
     inputs:
-      tag:
-        description: Existing release tag, for example v1.0.0
+      bump:
+        description: Version component to bump before building the CRX
         required: true
-        type: string
+        default: patch
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
 
 permissions:
   contents: write
 
 concurrency:
-  group: release-crx-${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+  group: cut-crx-release-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
   release:
     runs-on: ubuntu-24.04
     env:
-      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
       CHROME_PATH: /usr/bin/google-chrome
+      BUMP_TYPE: ${{ inputs.bump }}
 
     steps:
-      - name: Check out release tag
+      - name: Check out release branch
         uses: actions/checkout@v6
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+          ref: ${{ github.ref }}
+          fetch-depth: 0
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
@@ -42,16 +45,28 @@ jobs:
           node-version: 24
           package-manager-cache: false
 
-      - name: Validate release version
+      - name: Bump release version
+        id: version
         shell: bash
         run: |
           set -euo pipefail
-          manifest_version="$(node -e "const fs=require('node:fs');process.stdout.write(JSON.parse(fs.readFileSync('manifest.json')).version)")"
-          tag_version="${RELEASE_TAG#v}"
-          if [[ "$RELEASE_TAG" != v* || "$tag_version" != "$manifest_version" ]]; then
-            echo "Release tag $RELEASE_TAG must equal v$manifest_version from manifest.json." >&2
+          if [[ "$GITHUB_REF_TYPE" != "branch" ]]; then
+            echo "Cut CRX Release must be dispatched from a branch." >&2
             exit 1
           fi
+          version="$(node scripts/bump-version.mjs "$BUMP_TYPE")"
+          release_tag="v$version"
+          if git rev-parse --verify --quiet "refs/tags/$release_tag"; then
+            echo "Release tag $release_tag already exists." >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$release_tag" >> "$GITHUB_OUTPUT"
+          echo "RELEASE_VERSION=$version" >> "$GITHUB_ENV"
+          echo "RELEASE_TAG=$release_tag" >> "$GITHUB_ENV"
+
+      - name: Test and build bumped version
+        run: pnpm check
 
       - name: Restore CRX signing key
         shell: bash
@@ -68,11 +83,20 @@ jobs:
           chmod 600 "$key_path"
           echo "UNIMEASURE_CRX_KEY=$key_path" >> "$GITHUB_ENV"
 
-      - name: Test
-        run: pnpm test
-
       - name: Package CRX3
         run: pnpm package:crx
+
+      - name: Commit and tag release version
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json manifest.json dist
+          git commit -m "chore: bump version to $RELEASE_VERSION" \
+            -m "Co-Authored-By: Sicheng Chen (bot) <gh-bot@scchan.com>"
+          git tag "$RELEASE_TAG"
+          git push origin "HEAD:${GITHUB_REF_NAME}" "$RELEASE_TAG"
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v7

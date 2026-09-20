@@ -22,11 +22,10 @@ base64 < .crx/unimeasure.pem | tr -d '\n'
 
 ## Publish
 
-Push a tag matching the version in `manifest.json`:
+Open **Actions → Cut CRX Release → Run workflow**, choose the release branch, and select one version bump:
 
-```sh
-git tag v1.0.0
-git push origin v1.0.0
-```
+- `major` — for example, `1.2.0` → `2.0.0`
+- `minor` — for example, `1.2.0` → `1.3.0`
+- `patch` — for example, `1.2.0` → `1.2.1`
 
-The **Release CRX** workflow tests the extension, validates the tag, creates the CRX, stores it as a workflow artifact, and attaches it to a GitHub Release. It can also be dispatched manually with an existing tag.
+The workflow updates `package.json` and `manifest.json`, tests and builds the bumped version, commits the generated version files, creates and pushes the matching `v<version>` tag, creates the signed CRX, stores it as a workflow artifact, and attaches it to a GitHub Release.
