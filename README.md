@@ -25,7 +25,14 @@ Both conversion directions support length, area, volume, mass, temperature, spee
 
 ## Install
 
-Download the latest `UniMeasure-<version>.crx` from [GitHub Releases](https://github.com/sichengchen/imperial2metric/releases/latest) and install it from your browser's extensions page.
+Chrome on macOS and Windows does not permit direct installation of self-hosted CRX files. To install a GitHub release:
+
+1. Download `UniMeasure-<version>.zip` from [GitHub Releases](https://github.com/sichengchen/unimeasure/releases/latest).
+2. Extract the ZIP to a permanent folder.
+3. Open `chrome://extensions` and enable **Developer mode**.
+4. Choose **Load unpacked** and select the extracted folder.
+
+The CRX release asset is retained for Linux and enterprise-managed installations. Public one-click installation on macOS and Windows requires publishing through the Chrome Web Store.
 
 ## Development
 

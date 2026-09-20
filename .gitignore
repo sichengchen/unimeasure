@@ -1,4 +1,5 @@
 .crx/
 artifacts/*.crx
+artifacts/*.zip
 dist.crx
 dist.pem
