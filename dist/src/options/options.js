@@ -3,6 +3,7 @@
   const platform = globalThis.MeasurematePlatform;
   const enabled = document.querySelector("#enabled");
   const conversionMode = document.querySelector("#conversion-mode");
+  const smartModeRow = document.querySelector("#smart-mode-row");
   const smartMode = document.querySelector("#smart-mode");
   const direction = document.querySelector("#direction");
   const physicsRow = document.querySelector("#physics-row");
@@ -47,7 +48,9 @@
   }
 
   function renderSmartSettings() {
-    smartSettings.hidden = !smartMode.checked;
+    const manualMode = conversionMode.value === "manual";
+    smartModeRow.hidden = manualMode;
+    smartSettings.hidden = manualMode || !smartMode.checked;
     openRouterModelRow.hidden = smartProvider.value !== "openrouter";
     customEndpointRow.hidden = smartProvider.value !== "custom";
     customModelRow.hidden = smartProvider.value !== "custom";
@@ -117,6 +120,7 @@
   });
 
   conversionMode.addEventListener("change", () => {
+    renderSmartSettings();
     persistSettings();
   });
   smartMode.addEventListener("change", () => {
