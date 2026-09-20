@@ -1,6 +1,13 @@
 # UniMeasure
 
-UniMeasure is a dependency-light Chrome extension that appends metric equivalents to imperial and US customary measurements—or imperial equivalents to metric measurements—without replacing the original page text.
+UniMeasure is a dependency-light Chrome extension that converts imperial and US customary measurements to metric—or metric measurements to imperial—without replacing the original page text.
+
+It supports two interaction modes:
+
+- **Automatic** appends conversions as pages load.
+- **Manual** converts selected text from **UniMeasure → Convert selection** in the browser context menu and shows the result in a compact page card.
+
+Optional **Smart Mode** sends regex candidates and a short surrounding excerpt to Jev before automatic conversion, reducing false positives such as `scored 20 in 2026`. TypeSafe, OpenRouter (`Jev Latest` or `Jev 1.13`), and custom Jev-compatible endpoints are supported. Smart Mode requires the user's own API key.
 
 Examples:
 

@@ -17,6 +17,20 @@
             <input id="enabled" type="checkbox">
           </div>
           <div class="setting-row">
+            <label for="conversion-mode">Mode</label>
+            <select id="conversion-mode">
+              <option value="automatic">Automatic</option>
+              <option value="manual">Manual</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <label for="smart-mode">Smart Mode</label>
+              <span>Use Jev to reject ambiguous matches</span>
+            </div>
+            <input id="smart-mode" type="checkbox">
+          </div>
+          <div class="setting-row">
             <label for="direction">Convert to</label>
             <select id="direction">
               <option value="metric">Metric</option>
@@ -49,6 +63,41 @@
             <label for="highlight">Highlight additions</label>
             <input id="highlight" type="checkbox">
           </div>
+
+          <section id="smart-settings" class="smart-settings" hidden>
+            <div class="section-heading">
+              <h2>Smart Mode provider</h2>
+              <p>Jev checks each possible measurement before UniMeasure adds an automatic conversion.</p>
+            </div>
+            <div class="setting-row">
+              <label for="smart-provider">Provider</label>
+              <select id="smart-provider">
+                <option value="typesafe">TypeSafe</option>
+                <option value="openrouter">OpenRouter</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <label for="smart-api-key">API key</label>
+              <input id="smart-api-key" type="password" placeholder="Required" autocomplete="off" spellcheck="false">
+            </div>
+            <div id="openrouter-model-row" class="setting-row" hidden>
+              <label for="openrouter-model">Model</label>
+              <select id="openrouter-model">
+                <option value="~typesafe/jev-latest">Latest</option>
+                <option value="typesafe/jev-1.13">Jev 1.13</option>
+              </select>
+            </div>
+            <div id="custom-endpoint-row" class="setting-row" hidden>
+              <label for="custom-endpoint">Endpoint</label>
+              <input id="custom-endpoint" type="url" placeholder="https://api.example.com/v1/systemone" autocomplete="url" spellcheck="false">
+            </div>
+            <div id="custom-model-row" class="setting-row" hidden>
+              <label for="custom-model-id">Model ID</label>
+              <input id="custom-model-id" type="text" placeholder="jev-compatible-model" autocomplete="off" spellcheck="false">
+            </div>
+            <p class="privacy-note">Page excerpts that contain possible measurements are sent to your selected provider. Your API key stays in extension storage and is never exposed to the page.</p>
+          </section>
 
           <section>
             <h2>Site exceptions</h2>

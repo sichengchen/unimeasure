@@ -8,13 +8,39 @@ const { isSiteExcluded, normalizeHostname, sanitizeSettings } = globalThis.Measu
 test("accepts empty first-run storage", () => {
   assert.deepEqual(sanitizeSettings(null), {
     enabledByDefault: true,
+    conversionMode: "automatic",
+    smartMode: false,
     direction: "metric",
     physicsMode: false,
     precision: "smart",
     standard: "us",
     highlight: true,
-    excludedSites: []
+    excludedSites: [],
+    smartProvider: "typesafe",
+    smartApiKey: "",
+    openRouterModel: "~typesafe/jev-latest",
+    customEndpoint: "",
+    customModelId: ""
   });
+});
+
+test("sanitizes Smart Mode provider settings", () => {
+  assert.deepEqual(sanitizeSettings({
+    conversionMode: "smart",
+    smartProvider: "openrouter",
+    smartApiKey: "  secret  ",
+    openRouterModel: "typesafe/jev-1.13"
+  }), {
+    ...sanitizeSettings(),
+    conversionMode: "automatic",
+    smartMode: true,
+    smartProvider: "openrouter",
+    smartApiKey: "secret",
+    openRouterModel: "typesafe/jev-1.13"
+  });
+  assert.equal(sanitizeSettings({ conversionMode: "unknown" }).conversionMode, "automatic");
+  assert.equal(sanitizeSettings({ smartMode: true }).smartMode, true);
+  assert.equal(sanitizeSettings({ smartProvider: "unknown" }).smartProvider, "typesafe");
 });
 
 test("sanitizes the conversion direction", () => {

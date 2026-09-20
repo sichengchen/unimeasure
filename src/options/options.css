@@ -49,6 +49,9 @@ h1 {
 .setting-row:last-of-type { border-bottom: 1px solid var(--rule); }
 .setting-row[hidden] { display: none; }
 
+.setting-label { display: grid; gap: 4px; }
+.setting-label span { color: #5a5a5a; font-size: 13px; }
+
 input[type="checkbox"] {
   appearance: none;
   width: 42px;
@@ -82,7 +85,7 @@ input[type="checkbox"]:checked {
 
 input[type="checkbox"]:checked::after { transform: translateX(18px); background: #fff; }
 
-select, input[type="text"] {
+select, input[type="text"], input[type="password"], input[type="url"] {
   width: 100%;
   border: 1px solid #8c8c8c;
   border-radius: 2px;
@@ -90,7 +93,7 @@ select, input[type="text"] {
   background: #fff;
 }
 
-select, input[type="text"] {
+select, input[type="text"], input[type="password"], input[type="url"] {
   appearance: none;
   height: 42px;
   padding: 0 42px 0 14px;
@@ -101,9 +104,14 @@ select {
   background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 6 5 5 5-5' fill='none' stroke='%23080808' stroke-width='1.4'/%3E%3C/svg%3E") right 14px center/16px no-repeat;
 }
 
-input[type="text"] { appearance: none; padding-right: 14px; }
+input[type="text"], input[type="password"], input[type="url"] { appearance: none; padding-right: 14px; }
 
 section { margin-top: 44px; }
+
+.smart-settings[hidden] { display: none; }
+.section-heading { margin-bottom: 16px; }
+.section-heading p, .privacy-note { margin: 8px 0 0; color: #5a5a5a; font-size: 14px; line-height: 1.45; }
+.privacy-note { max-width: 620px; }
 
 h2 {
   margin: 0 0 8px;

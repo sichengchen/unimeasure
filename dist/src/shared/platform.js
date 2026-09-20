@@ -42,6 +42,17 @@
     else mockMessageListeners.add(listener);
   }
 
+  async function sendMessage(message) {
+    if (extensionChrome) return global.chrome.runtime.sendMessage(message);
+    for (const listener of mockMessageListeners) {
+      const response = await new Promise((resolve) => {
+        const returned = listener(message, {}, resolve);
+        if (returned !== true) queueMicrotask(() => resolve(returned));
+      });
+      if (response !== undefined) return response;
+    }
+  }
+
   async function sendTabMessage(tabId, message) {
     if (extensionChrome) return global.chrome.tabs.sendMessage(tabId, message);
     for (const listener of mockMessageListeners) {
@@ -76,6 +87,7 @@
     onMessage,
     onSettingsChanged,
     openOptionsPage,
+    sendMessage,
     sendTabMessage,
     setSettings
   };

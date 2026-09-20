@@ -8,6 +8,8 @@
   const ANNOTATION_CLASS = "measuremate-annotation";
   const SEPARATOR_CLASS = "measuremate-annotation-separator";
   const HIGHLIGHT_CLASS = "measuremate-annotation--highlighted";
+  const RESULT_CLASS = "measuremate-manual-result";
+  const SMART_BATCH_SIZE = 40;
   let settings;
   let enabled = false;
   let conversionCount = 0;
@@ -23,7 +25,7 @@
     return false;
   }
 
-  function replaceTextNode(node) {
+  function replaceTextNode(node, acceptedIndexes = null) {
     if (shouldSkipTextNode(node)) return 0;
 
     let sibling = node.nextSibling;
@@ -42,7 +44,7 @@
     }
 
     const text = node.nodeValue;
-    const conversions = findConversions(text, settings);
+    const conversions = findConversions(text, settings).filter((_conversion, index) => !acceptedIndexes || acceptedIndexes.has(index));
     if (conversions.length === 0) return 0;
 
     const fragment = document.createDocumentFragment();
@@ -70,21 +72,73 @@
     return conversions.length;
   }
 
-  function convertRoot(root) {
+  function collectTextNodes(root) {
+    if (root.nodeType === Node.TEXT_NODE) return shouldSkipTextNode(root) ? [] : [root];
+    if (root.nodeType !== Node.ELEMENT_NODE && root.nodeType !== Node.DOCUMENT_FRAGMENT_NODE) return [];
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: (node) => shouldSkipTextNode(node) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
+    });
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    return nodes;
+  }
+
+  function candidateContext(node) {
+    const text = node.parentElement?.innerText || node.nodeValue || "";
+    return text.replace(/\s+/g, " ").trim().slice(0, 600);
+  }
+
+  async function replaceSmartTextNodes(nodes) {
+    const entries = nodes.map((node) => ({
+      node,
+      text: node.nodeValue,
+      conversions: findConversions(node.nodeValue, settings),
+      accepted: new Set()
+    })).filter(({ conversions }) => conversions.length > 0);
+    const candidates = entries.flatMap((entry, entryIndex) => entry.conversions.map((conversion, conversionIndex) => ({
+      id: `candidate_${entryIndex}_${conversionIndex}`,
+      measurement: conversion.original,
+      context: candidateContext(entry.node),
+      entry,
+      conversionIndex
+    })));
+
+    for (let offset = 0; offset < candidates.length; offset += SMART_BATCH_SIZE) {
+      const batch = candidates.slice(offset, offset + SMART_BATCH_SIZE);
+      let response;
+      try {
+        response = await platform.sendMessage({
+          type: "measuremate:classify",
+          candidates: batch.map(({ id, measurement, context }) => ({ id, measurement, context }))
+        });
+      } catch (error) {
+        console.warn("UniMeasure Smart Mode could not reach its provider.", error);
+        return;
+      }
+      if (response?.error) {
+        console.warn(`UniMeasure Smart Mode: ${response.error}`);
+        return;
+      }
+      batch.forEach((candidate, index) => {
+        if (response?.decisions?.[index]) candidate.entry.accepted.add(candidate.conversionIndex);
+      });
+    }
+
+    for (const entry of entries) {
+      if (entry.node.isConnected && entry.node.nodeValue === entry.text) {
+        conversionCount += replaceTextNode(entry.node, entry.accepted);
+      }
+    }
+  }
+
+  async function convertRoot(root) {
     if (!enabled || processing || !root?.isConnected) return;
     processing = true;
     observer?.disconnect();
     try {
-      if (root.nodeType === Node.TEXT_NODE) {
-        conversionCount += replaceTextNode(root);
-      } else if (root.nodeType === Node.ELEMENT_NODE || root.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
-          acceptNode: (node) => shouldSkipTextNode(node) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
-        });
-        const nodes = [];
-        while (walker.nextNode()) nodes.push(walker.currentNode);
-        for (const node of nodes) conversionCount += replaceTextNode(node);
-      }
+      const nodes = collectTextNodes(root);
+      if (settings.smartMode) await replaceSmartTextNodes(nodes);
+      else for (const node of nodes) conversionCount += replaceTextNode(node);
     } finally {
       processing = false;
       observe();
@@ -111,7 +165,7 @@
     queueMicrotask(() => {
       const roots = [...pendingRoots];
       pendingRoots.clear();
-      roots.forEach(convertRoot);
+      roots.forEach((candidate) => convertRoot(candidate));
     });
   }
 
@@ -121,11 +175,13 @@
     const stateChanged = nextEnabled !== enabled;
     enabled = nextEnabled;
     if ((!enabled && stateChanged) || forceRebuild) clearAnnotations();
-    if (enabled && (stateChanged || forceRebuild || conversionCount === 0)) convertRoot(document.body);
+    if (enabled && settings.conversionMode !== "manual" && (stateChanged || forceRebuild || conversionCount === 0)) {
+      await convertRoot(document.body);
+    }
   }
 
   observer = new MutationObserver((mutations) => {
-    if (processing || !enabled) return;
+    if (processing || !enabled || settings?.conversionMode === "manual") return;
     for (const mutation of mutations) {
       if (mutation.type === "characterData") scheduleRoot(mutation.target);
       for (const node of mutation.addedNodes) scheduleRoot(node);
@@ -141,10 +197,63 @@
       applySettings(message.settings, true).then(() => sendResponse({ enabled, count: conversionCount }));
       return true;
     }
+    if (message?.type === "measuremate:manual-convert") {
+      showManualResult(message.selectionText || "");
+      sendResponse({ shown: true });
+      return false;
+    }
     return false;
   });
 
   platform.onSettingsChanged((nextSettings) => applySettings(nextSettings, true));
 
   platform.getSettings().then((stored) => applySettings(stored));
+
+  function showManualResult(selectionText) {
+    document.querySelector(`.${RESULT_CLASS}`)?.remove();
+    const conversions = findConversions(selectionText, settings);
+    const result = document.createElement("section");
+    result.className = RESULT_CLASS;
+    result.dataset.measuremateIgnore = "true";
+    result.setAttribute("role", "status");
+
+    const heading = document.createElement("strong");
+    heading.textContent = "UniMeasure";
+    const close = document.createElement("button");
+    close.type = "button";
+    close.setAttribute("aria-label", "Close conversion result");
+    close.textContent = "×";
+    close.addEventListener("click", () => result.remove());
+    const header = document.createElement("header");
+    header.append(heading, close);
+    result.append(header);
+
+    if (!enabled) {
+      const message = document.createElement("p");
+      message.textContent = "UniMeasure is turned off for this site.";
+      result.append(message);
+    } else if (conversions.length === 0) {
+      const message = document.createElement("p");
+      message.textContent = "No supported measurement found in the selection.";
+      result.append(message);
+    } else {
+      const list = document.createElement("ul");
+      for (const conversion of conversions) {
+        const item = document.createElement("li");
+        const original = document.createElement("span");
+        original.textContent = conversion.original;
+        const arrow = document.createElement("span");
+        arrow.setAttribute("aria-hidden", "true");
+        arrow.textContent = "→";
+        const converted = document.createElement("b");
+        converted.textContent = conversion.converted;
+        item.append(original, arrow, converted);
+        list.append(item);
+      }
+      result.append(list);
+    }
+
+    document.documentElement.append(result);
+    window.setTimeout(() => result.remove(), 12000);
+  }
 })();

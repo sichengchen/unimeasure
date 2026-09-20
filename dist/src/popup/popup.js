@@ -3,6 +3,8 @@
   const platform = globalThis.MeasurematePlatform;
   const siteToggle = document.querySelector("#site-enabled");
   const direction = document.querySelector("#direction");
+  const conversionMode = document.querySelector("#conversion-mode");
+  const smartMode = document.querySelector("#smart-mode");
   const physicsRow = document.querySelector("#physics-row");
   const physicsMode = document.querySelector("#physics-mode");
   const precision = document.querySelector("#precision");
@@ -47,6 +49,8 @@
   });
 
   precision.addEventListener("change", () => saveSettings({ precision: precision.value }));
+  conversionMode.addEventListener("change", () => saveSettings({ conversionMode: conversionMode.value }));
+  smartMode.addEventListener("change", () => saveSettings({ smartMode: smartMode.checked }));
   direction.addEventListener("change", () => {
     physicsRow.hidden = direction.value !== "metric";
     saveSettings({ direction: direction.value });
@@ -62,6 +66,8 @@
     activeTab = tab;
     try { hostname = normalizeHostname(new URL(tab.url).hostname); } catch { hostname = ""; }
     precision.value = settings.precision;
+    conversionMode.value = settings.conversionMode;
+    smartMode.checked = settings.smartMode;
     direction.value = settings.direction;
     physicsMode.checked = settings.physicsMode;
     physicsRow.hidden = settings.direction !== "metric";

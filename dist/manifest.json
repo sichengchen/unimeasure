@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "UniMeasure",
   "description": "Converts between imperial and metric measurements on the web.",
-  "version": "1.1.1",
-  "permissions": ["activeTab", "storage"],
+  "version": "1.2.0",
+  "permissions": ["activeTab", "storage", "contextMenus"],
   "host_permissions": ["http://*/*", "https://*/*"],
   "action": {
     "default_title": "UniMeasure",
@@ -22,6 +22,9 @@
     "128": "icons/icon-128.png"
   },
   "options_page": "src/options/options.html",
+  "background": {
+    "service_worker": "src/background/background.js"
+  },
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],

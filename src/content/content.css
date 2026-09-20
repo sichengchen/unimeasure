@@ -18,3 +18,46 @@
   border-radius: 2px;
   padding: 0 0.08em;
 }
+
+.measuremate-manual-result {
+  all: initial;
+  position: fixed;
+  z-index: 2147483647;
+  right: 20px;
+  bottom: 20px;
+  width: min(340px, calc(100vw - 40px));
+  padding: 16px;
+  border: 1px solid #080808;
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: #080808;
+  background: #fff;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 18%);
+  font: 15px/1.35 Arial, Helvetica, sans-serif;
+}
+
+.measuremate-manual-result header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 12px;
+}
+
+.measuremate-manual-result strong { font: 700 16px/1 Arial, Helvetica, sans-serif; }
+.measuremate-manual-result button {
+  width: 28px;
+  height: 28px;
+  margin: -6px -6px -6px 12px;
+  border: 0;
+  padding: 0;
+  color: #080808;
+  background: transparent;
+  font: 22px/28px Arial, Helvetica, sans-serif;
+  cursor: pointer;
+}
+.measuremate-manual-result p { margin: 0; font: inherit; }
+.measuremate-manual-result ul { list-style: none; margin: 0; padding: 0; }
+.measuremate-manual-result li { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: baseline; padding: 8px 0; border-top: 1px solid #d2d2d2; }
+.measuremate-manual-result li:first-child { border-top: 0; padding-top: 0; }
+.measuremate-manual-result li:last-child { padding-bottom: 0; }
+.measuremate-manual-result b { color: #0047ff; font-weight: 700; }
