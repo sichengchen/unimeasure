@@ -2,9 +2,16 @@
   "manifest_version": 3,
   "name": "UniMeasure",
   "description": "Converts between imperial and metric measurements on the web.",
-  "version": "1.2.0",
-  "permissions": ["activeTab", "storage", "contextMenus"],
-  "host_permissions": ["http://*/*", "https://*/*"],
+  "version": "1.2.1",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
   "action": {
     "default_title": "UniMeasure",
     "default_popup": "src/popup/popup.html",
@@ -27,9 +34,19 @@
   },
   "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["src/shared/platform.js", "src/shared/settings.js", "src/shared/converter.js", "src/content/content.js"],
-      "css": ["src/content/content.css"],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "src/shared/platform.js",
+        "src/shared/settings.js",
+        "src/shared/converter.js",
+        "src/content/content.js"
+      ],
+      "css": [
+        "src/content/content.css"
+      ],
       "run_at": "document_idle"
     }
   ]
