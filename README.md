@@ -1,13 +1,13 @@
 # UniMeasure
 
-UniMeasure is a dependency-light Chrome extension that converts imperial and US customary measurements to metric—or metric measurements to imperial—without replacing the original page text.
+UniMeasure is a Chrome extension that converts imperial and US customary measurements to metric—or metric measurements to imperial.
 
 It supports two interaction modes:
 
 - **Automatic** appends conversions as pages load.
-- **Manual** converts selected text from **UniMeasure → Convert selection** in the browser context menu and shows the result in a compact page card.
+- **Manual** converts selected text from **UniMeasure → Convert selection** in the browser context menu.
 
-Optional **Smart Mode** sends regex candidates and a short surrounding excerpt to Jev before automatic conversion, reducing false positives such as `scored 20 in 2026`. TypeSafe, OpenRouter (`Jev Latest` or `Jev 1.13`), and custom Jev-compatible endpoints are supported. Smart Mode requires the user's own API key.
+Optional **Smart Mode** sends regex candidates and a short surrounding excerpt to [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) before automatic conversion, reducing false positives such as `scored 20 in 2026`.
 
 Examples:
 
@@ -25,14 +25,14 @@ Both conversion directions support length, area, volume, mass, temperature, spee
 
 ## Install
 
-Chrome on macOS and Windows does not permit direct installation of self-hosted CRX files. To install a GitHub release:
+Since Chrome on macOS and Windows does not permit direct installation of self-hosted CRX files, to install:
 
 1. Download `UniMeasure-<version>.zip` from [GitHub Releases](https://github.com/sichengchen/unimeasure/releases/latest).
 2. Extract the ZIP to a permanent folder.
 3. Open `chrome://extensions` and enable **Developer mode**.
 4. Choose **Load unpacked** and select the extracted folder.
 
-The CRX release asset is retained for Linux and enterprise-managed installations. Public one-click installation on macOS and Windows requires publishing through the Chrome Web Store.
+The CRX release asset can be installed on Linux and enterprise-managed Chrome.
 
 ## Development
 
